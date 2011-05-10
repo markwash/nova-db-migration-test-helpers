@@ -80,7 +80,7 @@ def _verify(cases, engine):
         errors = True
         print 'PROBABLY BAD: Quota counts do not match'
     if errors is False:
-        print 'Upgrade appears successful'
+        print 'Migration appears successful'
 
 def verify_after_upgrade(engine):
     _verify(upgrade_cases(), engine)
