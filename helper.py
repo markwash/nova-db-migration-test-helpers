@@ -55,11 +55,15 @@ def setup_for_upgrade(engine):
             quota.save()
 
 def verify_after_upgrade(engine):
+    errors = False
     Quota = _get_quota_class(engine)
     for case in upgrade_cases():
         for map in case['after']:
             if not Quota.find(map):
+                errors = True
                 print 'ERROR: could not find record matching %s' % map
+    if errors is False:
+        print 'Upgrade appears successful'
 
 def upgrade_cases():
     """ list of upgrade cases 
@@ -204,7 +208,7 @@ def _get_quota_class(engine):
         @classmethod
         def find(cls, map):
             session = Session()
-            return session.query(cls).filter_by(map).first()
+            return session.query(cls).filter_by(**map).first()
 
     return Quota
 
