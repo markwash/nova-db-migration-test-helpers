@@ -46,9 +46,77 @@ def setup_sql_alchemy(url):
 
 def setup_for_upgrade(engine):
     Quota = _get_quota_class(engine)
-    quota = Quota()
-    quota.project_id = 'admin'
-    quota.save()
+    for case in upgrade_cases():
+        for map in case['before']:
+            quota = Quota()
+            quota.update(map)
+            quota.save()
+
+def upgrade_cases():
+    """ list of upgrade cases 
+    
+    On the downgrade side we want to make sure we check
+    cases where the setting is unlimited to see what happens.
+    I guess it should revert to the default.
+    """
+    time1 = datetime.datetime.fromtimestamp(100 * 10**6)
+    cases = [
+        {
+            'before': [
+                {
+                    'created_at': time1,
+                    'updated_at': None,
+                    'deleted_at': None,
+                    'deleted': False,
+                    'project_id': 'test1',
+                    'instances': 10,
+                    'cores': 40,
+                    'gigabytes': 20,
+                    'floating_ips': None,
+                    'metadata_items': 5,
+                },
+            ],
+            'after': [
+                {
+                    'created_at': time1,
+                    'updated_at': None,
+                    'deleted_at': None,
+                    'deleted': False
+                    'project_id': 'test1',
+                    'resource': 'instances',
+                    'limit': 10
+                },
+                {
+                    'created_at': time1,
+                    'updated_at': None,
+                    'deleted_at': None,
+                    'deleted': False
+                    'project_id': 'test1',
+                    'resource': 'cores',
+                    'limit': 40
+                },
+                {
+                    'created_at': time1,
+                    'updated_at': None,
+                    'deleted_at': None,
+                    'deleted': False
+                    'project_id': 'test1',
+                    'resource': 'gigabytes',
+                    'limit': 20
+                },
+                {
+                    'created_at': time1,
+                    'updated_at': None,
+                    'deleted_at': None,
+                    'deleted': False
+                    'project_id': 'test1',
+                    'resource': 'metadata_items',
+                    'limit': 5
+                },
+            ],
+        },
+    ]
+    return cases
 
 def setup_for_failed_upgrade(engine):
     Quota = _get_quota_class(engine)
@@ -108,6 +176,10 @@ def _get_quota_class(engine):
             session = Session()
             session.delete(self)
             session.commit()
+
+        def update(self, map):
+            for key, value in map.iteritems():
+                setattr(self, key, value)
 
         @classmethod
         def clear_all(cls):
