@@ -14,8 +14,8 @@ def main():
         setup_for_upgrade(engine)
     elif command == 'setup_for_failed_upgrade':
         setup_for_failed_upgrade(engine)
-    elif command == 'list':
-        list(engine)
+    elif command == 'list_rows':
+        list_rows(engine)
     elif command == 'upgrade':
         upgrade(sql_url)
     elif command == 'downgrade':
@@ -74,14 +74,14 @@ def upgrade(sql_url):
 def downgrade(sql_url):
     _run_cmd("python /usr/lib/pymodules/python2.6/nova/db/sqlalchemy/migrate_repo/manage.py downgrade 15 --url=%s --repository=/usr/lib/pymodules/python2.6/nova/db/sqlalchemy/migrate_repo" % sql_url)
 
-def list(engine):
+def list_rows(engine):
     Quota = _get_quota_class(engine)
     for quota in Quota.list_all():
         d = {}
         for key in dir(quota):
             if key.startswith('_'):
                 continue
-            d[key] = quota[key]
+            d[key] = getattr(quota, key)
         print d
 
 def _get_quota_class(engine):
