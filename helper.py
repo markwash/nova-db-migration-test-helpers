@@ -12,12 +12,16 @@ def main():
     engine, meta = setup_sql_alchemy(sql_url)
     if command == 'setup_for_upgrade':
         setup_for_upgrade(engine)
+    elif command == 'setup_for_downgrade':
+        setup_for_downgrade(engine)
     elif command == 'setup_for_failed_upgrade':
         setup_for_failed_upgrade(engine)
     elif command == 'list_rows':
         list_rows(engine)
     elif command == 'verify_after_upgrade':
         verify_after_upgrade(engine)
+    elif command == 'verify_after_downgrade':
+        verify_after_downgrade(engine)
     elif command == 'upgrade':
         upgrade(sql_url)
     elif command == 'downgrade':
@@ -46,19 +50,25 @@ def setup_sql_alchemy(url):
     meta = sqlalchemy.MetaData()
     return engine, meta
 
-def setup_for_upgrade(engine):
+def _setup(cases, engine):
     Quota = _get_quota_class(engine)
-    for case in upgrade_cases():
+    for case in cases:
         for map in case['before']:
             quota = Quota()
             quota.update(map)
             quota.save()
 
-def verify_after_upgrade(engine):
+def setup_for_upgrade(engine):
+    _setup(upgrade_cases(), engine)
+
+def setup_for_downgrade(engine):
+    _setup(downgrade_cases(), engine)
+
+def _verify(cases, engine):
     errors = False
     Quota = _get_quota_class(engine)
     count = 0
-    for case in upgrade_cases():
+    for case in cases:
         for map in case['after']:
             count += 1
             if not Quota.find(map):
@@ -71,6 +81,12 @@ def verify_after_upgrade(engine):
         print 'PROBABLY BAD: Quota counts do not match'
     if errors is False:
         print 'Upgrade appears successful'
+
+def verify_after_upgrade(engine):
+    _verify(upgrade_cases(), engine)
+
+def verify_after_downgrade(engine):
+    _verify(downgrade_cases(), engine)
 
 def upgrade_cases():
     """ list of upgrade cases 
@@ -162,6 +178,9 @@ def upgrade_cases():
         },
     ]
     return cases
+
+def downgrade_cases():
+    return []
 
 def setup_for_failed_upgrade(engine):
     Quota = _get_quota_class(engine)
