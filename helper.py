@@ -88,6 +88,92 @@ def verify_after_upgrade(engine):
 def verify_after_downgrade(engine):
     _verify(downgrade_cases(), engine)
 
+def setup_for_failed_upgrade(engine):
+    Quota = _get_quota_class(engine)
+    quota = Quota()
+    quota.project_id = 'admin'
+    quota.save()
+    quota = Quota()
+    quota.project_id = 'admin'
+    quota.instances = 100
+    quota.save()
+
+def clear_all(engine):
+    Quota = _get_quota_class(engine)
+    Quota.clear_all()
+
+def _run_cmd(cmd):
+    cmd_parts = cmd.split()
+    os.execv('/usr/bin/%s' % cmd_parts[0], cmd_parts)
+
+def upgrade(sql_url):
+    _run_cmd("python /usr/lib/pymodules/python2.6/nova/db/sqlalchemy/migrate_repo/manage.py upgrade 16 --url=%s --repository=/usr/lib/pymodules/python2.6/nova/db/sqlalchemy/migrate_repo" % sql_url)
+
+def downgrade(sql_url):
+    _run_cmd("python /usr/lib/pymodules/python2.6/nova/db/sqlalchemy/migrate_repo/manage.py downgrade 15 --url=%s --repository=/usr/lib/pymodules/python2.6/nova/db/sqlalchemy/migrate_repo" % sql_url)
+
+def list_rows(engine):
+    Quota = _get_quota_class(engine)
+    for quota in Quota.list_all():
+        print '-------------------'
+        for key in dir(quota):
+            if key.startswith('_'):
+                continue
+            value = getattr(quota, key)
+            if hasattr(value, '__call__'):
+                continue
+            print '  %s: %s' % (key, value)
+
+def _get_quota_class(engine):
+    Base = declarative_base()
+    Base.metadata.bind = engine
+    Session = sessionmaker(bind=engine)
+    class Quota(Base):
+        __tablename__ = 'quotas'
+        __table_args__ = {'autoload': True}
+        created_at = sqlalchemy.Column(sqlalchemy.DateTime,
+            default=datetime.datetime.utcnow)
+        updated_at = sqlalchemy.Column(sqlalchemy.DateTime,
+            onupdate=datetime.datetime.utcnow)
+        deleted = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
+        
+        def save(self):
+            session = Session()
+            session.add(self)
+            session.commit()
+
+        def delete(self):
+            session = Session()
+            session.delete(self)
+            session.commit()
+
+        def update(self, map):
+            for key, value in map.iteritems():
+                setattr(self, key, value)
+
+        @classmethod
+        def clear_all(cls):
+            session = Session()
+            session.query(cls).delete()
+            session.commit()
+
+        @classmethod
+        def list_all(cls):
+            session = Session()
+            return list(session.query(cls))
+
+        @classmethod
+        def find(cls, map):
+            session = Session()
+            return session.query(cls).filter_by(**map).first()
+
+        @classmethod
+        def count(cls):
+            session = Session()
+            return session.query(cls).count()
+
+    return Quota
+
 def upgrade_cases():
     """ list of upgrade cases 
     
@@ -181,92 +267,6 @@ def upgrade_cases():
 
 def downgrade_cases():
     return []
-
-def setup_for_failed_upgrade(engine):
-    Quota = _get_quota_class(engine)
-    quota = Quota()
-    quota.project_id = 'admin'
-    quota.save()
-    quota = Quota()
-    quota.project_id = 'admin'
-    quota.instances = 100
-    quota.save()
-
-def clear_all(engine):
-    Quota = _get_quota_class(engine)
-    Quota.clear_all()
-
-def _run_cmd(cmd):
-    cmd_parts = cmd.split()
-    os.execv('/usr/bin/%s' % cmd_parts[0], cmd_parts)
-
-def upgrade(sql_url):
-    _run_cmd("python /usr/lib/pymodules/python2.6/nova/db/sqlalchemy/migrate_repo/manage.py upgrade 16 --url=%s --repository=/usr/lib/pymodules/python2.6/nova/db/sqlalchemy/migrate_repo" % sql_url)
-
-def downgrade(sql_url):
-    _run_cmd("python /usr/lib/pymodules/python2.6/nova/db/sqlalchemy/migrate_repo/manage.py downgrade 15 --url=%s --repository=/usr/lib/pymodules/python2.6/nova/db/sqlalchemy/migrate_repo" % sql_url)
-
-def list_rows(engine):
-    Quota = _get_quota_class(engine)
-    for quota in Quota.list_all():
-        print '-------------------'
-        for key in dir(quota):
-            if key.startswith('_'):
-                continue
-            value = getattr(quota, key)
-            if hasattr(value, '__call__'):
-                continue
-            print '  %s: %s' % (key, value)
-
-def _get_quota_class(engine):
-    Base = declarative_base()
-    Base.metadata.bind = engine
-    Session = sessionmaker(bind=engine)
-    class Quota(Base):
-        __tablename__ = 'quotas'
-        __table_args__ = {'autoload': True}
-        created_at = sqlalchemy.Column(sqlalchemy.DateTime,
-            default=datetime.datetime.utcnow)
-        updated_at = sqlalchemy.Column(sqlalchemy.DateTime,
-            onupdate=datetime.datetime.utcnow)
-        deleted = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
-        
-        def save(self):
-            session = Session()
-            session.add(self)
-            session.commit()
-
-        def delete(self):
-            session = Session()
-            session.delete(self)
-            session.commit()
-
-        def update(self, map):
-            for key, value in map.iteritems():
-                setattr(self, key, value)
-
-        @classmethod
-        def clear_all(cls):
-            session = Session()
-            session.query(cls).delete()
-            session.commit()
-
-        @classmethod
-        def list_all(cls):
-            session = Session()
-            return list(session.query(cls))
-
-        @classmethod
-        def find(cls, map):
-            session = Session()
-            return session.query(cls).filter_by(**map).first()
-
-        @classmethod
-        def count(cls):
-            session = Session()
-            return session.query(cls).count()
-
-    return Quota
 
 if __name__ == '__main__':
     main()
