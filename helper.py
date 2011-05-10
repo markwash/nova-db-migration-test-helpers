@@ -16,6 +16,8 @@ def main():
         setup_for_failed_upgrade(engine)
     elif command == 'list_rows':
         list_rows(engine)
+    elif command == 'verify_after_upgrade':
+        verify_after_upgrade(engine)
     elif command == 'upgrade':
         upgrade(sql_url)
     elif command == 'downgrade':
@@ -51,6 +53,13 @@ def setup_for_upgrade(engine):
             quota = Quota()
             quota.update(map)
             quota.save()
+
+def verify_after_upgrade(engine):
+    Quota = _get_quota_class(engine)
+    for case in upgrade_cases():
+        for map in case['after']:
+            if not Quota.find(map):
+                print 'ERROR: could not find record matching %s' % map
 
 def upgrade_cases():
     """ list of upgrade cases 
@@ -191,6 +200,11 @@ def _get_quota_class(engine):
         def list_all(cls):
             session = Session()
             return list(session.query(cls))
+
+        @classmethod
+        def find(cls, map):
+            session = Session()
+            return session.query(cls).filter_by(map).first()
 
     return Quota
 
