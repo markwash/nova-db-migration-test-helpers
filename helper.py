@@ -57,11 +57,18 @@ def setup_for_upgrade(engine):
 def verify_after_upgrade(engine):
     errors = False
     Quota = _get_quota_class(engine)
+    count = 0
     for case in upgrade_cases():
         for map in case['after']:
+            count++
             if not Quota.find(map):
                 errors = True
                 print 'ERROR: could not find record matching %s' % map
+    if count == Quota.count():
+        print 'MAYBE GOOD: Quota counts match'
+    else:
+        errors = True
+        print 'PROBABLY BAD: Quota counts do not match'
     if errors is False:
         print 'Upgrade appears successful'
 
@@ -73,6 +80,8 @@ def upgrade_cases():
     I guess it should revert to the default.
     """
     time1 = datetime.datetime.fromtimestamp(100 * 10**6)
+    time2 = datetime.datetime.fromtimestamp(200 * 10**6)
+    time3 = datetime.datetime.fromtimestamp(300 * 10**6)
     cases = [
         {
             'before': [
@@ -125,6 +134,29 @@ def upgrade_cases():
                     'project_id': 'test1',
                     'resource': 'metadata_items',
                     'limit': 5
+                },
+            ],
+        },
+        {
+            'before': [
+                {
+                    'project_id': 'test2',
+                    'created_at': time1,
+                    'updated_at': time2,
+                    'deleted_at': time3,
+                    'deleted': True,
+                    'volumes': 10,
+                },
+            ],
+            'after': [
+                {
+                    'project_id': 'test2',
+                    'created_at': time1,
+                    'updated_at': time2,
+                    'deleted_at': time3,
+                    'deleted': True,
+                    'resource': 'volumes',
+                    'limit': 10,
                 },
             ],
         },
@@ -209,6 +241,11 @@ def _get_quota_class(engine):
         def find(cls, map):
             session = Session()
             return session.query(cls).filter_by(**map).first()
+
+        @classmethod
+        def count(cls):
+            session = Session()
+            return session.query(cls).count()
 
     return Quota
 
