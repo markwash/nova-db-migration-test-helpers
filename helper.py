@@ -81,7 +81,7 @@ def upgrade_cases():
                     'created_at': time1,
                     'updated_at': None,
                     'deleted_at': None,
-                    'deleted': False
+                    'deleted': False,
                     'project_id': 'test1',
                     'resource': 'instances',
                     'limit': 10
@@ -90,7 +90,7 @@ def upgrade_cases():
                     'created_at': time1,
                     'updated_at': None,
                     'deleted_at': None,
-                    'deleted': False
+                    'deleted': False,
                     'project_id': 'test1',
                     'resource': 'cores',
                     'limit': 40
@@ -99,7 +99,7 @@ def upgrade_cases():
                     'created_at': time1,
                     'updated_at': None,
                     'deleted_at': None,
-                    'deleted': False
+                    'deleted': False,
                     'project_id': 'test1',
                     'resource': 'gigabytes',
                     'limit': 20
@@ -108,7 +108,7 @@ def upgrade_cases():
                     'created_at': time1,
                     'updated_at': None,
                     'deleted_at': None,
-                    'deleted': False
+                    'deleted': False,
                     'project_id': 'test1',
                     'resource': 'metadata_items',
                     'limit': 5
