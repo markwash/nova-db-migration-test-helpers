@@ -60,7 +60,7 @@ def verify_after_upgrade(engine):
     count = 0
     for case in upgrade_cases():
         for map in case['after']:
-            count++
+            count += 1
             if not Quota.find(map):
                 errors = True
                 print 'ERROR: could not find record matching %s' % map
