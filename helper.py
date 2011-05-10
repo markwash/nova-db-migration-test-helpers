@@ -77,12 +77,14 @@ def downgrade(sql_url):
 def list_rows(engine):
     Quota = _get_quota_class(engine)
     for quota in Quota.list_all():
-        d = {}
+        print '-------------------'
         for key in dir(quota):
             if key.startswith('_'):
                 continue
-            d[key] = getattr(quota, key)
-        print d
+            value = getattr(quota, key)
+            if hasattr(value, '__call__'):
+                continue
+            print '  %s: %s' % (key, value)
 
 def _get_quota_class(engine):
     Base = declarative_base()
