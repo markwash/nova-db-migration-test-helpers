@@ -97,6 +97,7 @@ def _get_quota_class(engine):
             default=datetime.datetime.utcnow)
         updated_at = sqlalchemy.Column(sqlalchemy.DateTime,
             onupdate=datetime.datetime.utcnow)
+        deleted = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
         
         def save(self):
             session = Session()
