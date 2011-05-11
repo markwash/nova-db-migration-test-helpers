@@ -341,6 +341,26 @@ def downgrade_cases():
                 },
             ],
         },
+        { # Unrecognized resources disappear
+            'before': [
+                {
+                    'project_id': 'test_unrecognized_resources',
+                    'resource': 'instances',
+                    'limit': 10,
+                },
+                {
+                    'project_id': 'test_unrecognized_resources',
+                    'resource': 'cloudflowers',
+                    'limit': 1,
+                },
+            ],
+            'after': [
+                {
+                    'project_id': 'test_unrecognized_resources',
+                    'instances': 10,
+                },
+            ],
+        },
     ]
 
 if __name__ == '__main__':
