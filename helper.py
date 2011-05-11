@@ -16,6 +16,8 @@ def main():
         setup_for_downgrade(engine)
     elif command == 'setup_for_failed_upgrade':
         setup_for_failed_upgrade(engine)
+    elif command == 'setup_for_failed_downgrade':
+        setup_for_failed_downgrade(engine)
     elif command == 'list_rows':
         list_rows(engine)
     elif command == 'verify_after_upgrade':
@@ -97,6 +99,19 @@ def setup_for_failed_upgrade(engine):
     quota.project_id = 'admin'
     quota.instances = 100
     quota.save()
+
+def setup_for_failed_downgrade(engine):
+    Quota = _get_quota_class(engine)
+    quota = Quota()
+    quota.project_id = 'test_failed_downgrade_project_id',
+    quota.resource = 'instances',
+    quota.save()
+    quota = Quota()
+    quota.project_id = 'test_failed_downgrade_project_id',
+    quota.resource = 'instances',
+    quota.limit = 10,
+    quota.save()
+    
 
 def clear_all(engine):
     Quota = _get_quota_class(engine)
