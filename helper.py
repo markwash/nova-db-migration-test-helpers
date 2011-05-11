@@ -266,7 +266,48 @@ def upgrade_cases():
     return cases
 
 def downgrade_cases():
-    return []
+    time1 = datetime.datetime.fromtimestamp(100 * 10**6)
+    time2 = datetime.datetime.fromtimestamp(200 * 10**6)
+    return [
+        { 
+            'before': [
+                # Normal case: many become one, earliest create wins
+                {
+                    'project_id': 'test_usual',
+                    'created_at': time1,
+                    'resource': 'instances',
+                    'limit': 10,
+                },
+                {
+                    'project_id': 'test_usual',
+                    'created_at': time2,
+                    'resource': 'cores',
+                    'limit': 20,
+                },
+                {
+                    'project_id': 'test_usual',
+                    'created_at': None,
+                    'resource': 'volumes',
+                    'limit': 10,
+                },
+            ],
+            'after': [
+                {
+                    'project_id': 'test_usual',
+                    'created_at': time1,
+                    'updated_at': None,
+                    'deleted_at': None,
+                    'deleted': False,
+                    'instances': 10,
+                    'cores': 20,
+                    'volumes': 10,
+                    'gigabytes': None,
+                    'floating_ips': None,
+                    'metadata_items': None,
+                },
+            ],
+        },
+    ]
 
 if __name__ == '__main__':
     main()
