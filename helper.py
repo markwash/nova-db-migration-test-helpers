@@ -307,6 +307,40 @@ def downgrade_cases():
                 },
             ],
         },
+        { # Last update time wins
+            'before': [
+                {
+                    'project_id': 'test_update_time',
+                    'updated_at': time1,
+                    'resource': 'gigabytes',
+                    'limit': 50,
+                },
+                {
+                    'project_id': 'test_update_time',
+                    'updated_at': time2,
+                    'resource': 'floating_ips',
+                    'limit': 10,
+                },
+                {
+                    'project_id': 'test_update_time',
+                    'updated_at': None,
+                    'resource': 'metadata_items',
+                    'limit': 5,
+                },
+            ],
+            'after': [
+                {
+                    'project_id': 'test_update_time',
+                    'updated_at': time2,
+                    'instances': None,
+                    'cores': None,
+                    'volumes': None,
+                    'gigabytes': 50,
+                    'floating_ips': 10,
+                    'metadata_items': 5,
+                },
+            ],
+        },
     ]
 
 if __name__ == '__main__':
