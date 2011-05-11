@@ -370,6 +370,7 @@ def downgrade_cases():
                     'resource': 'instances',
                     'limit': 10,
                 },
+            ],
             'after': [],
         },
     ]
