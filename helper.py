@@ -373,6 +373,28 @@ def downgrade_cases():
             ],
             'after': [],
         },
+        { # Unlimited resources are set to the default
+            'before': [
+                {
+                    'project_id': 'test_unlimited_instances',
+                    'resource': 'instances',
+                    'limit': None,
+                },
+                {
+                    'project_id': 'test_unlimited_instances',
+                    'resource': 'cores',
+                    'limit': 10,
+                },
+            ],
+            'after': [
+                {
+                    'project_id': 'test_unlimited_instances',
+                    'deleted': False,
+                    'instances': None,
+                    'cores': 10,
+                },
+            ],
+        },
     ]
 
 if __name__ == '__main__':
