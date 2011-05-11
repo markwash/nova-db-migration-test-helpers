@@ -361,6 +361,17 @@ def downgrade_cases():
                 },
             ],
         },
+        { # History disappears
+            'before': [
+                {
+                    'project_id': 'test_history_disappears',
+                    'deleted': True,
+                    'deleted_at': time2,
+                    'resource': 'instances',
+                    'limit': 10,
+                },
+            'after': [],
+        },
     ]
 
 if __name__ == '__main__':
