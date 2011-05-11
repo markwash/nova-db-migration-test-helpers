@@ -103,13 +103,13 @@ def setup_for_failed_upgrade(engine):
 def setup_for_failed_downgrade(engine):
     Quota = _get_quota_class(engine)
     quota = Quota()
-    quota.project_id = 'test_failed_downgrade_project_id',
-    quota.resource = 'instances',
+    quota.project_id = 'test_failed_downgrade_project_id'
+    quota.resource = 'instances'
     quota.save()
     quota = Quota()
-    quota.project_id = 'test_failed_downgrade_project_id',
-    quota.resource = 'instances',
-    quota.limit = 10,
+    quota.project_id = 'test_failed_downgrade_project_id'
+    quota.resource = 'instances'
+    quota.limit = 10
     quota.save()
     
 
