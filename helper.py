@@ -109,7 +109,7 @@ def setup_for_failed_downgrade(engine):
     quota = Quota()
     quota.project_id = 'test_failed_downgrade_project_id'
     quota.resource = 'instances'
-    quota.limit = 10
+    quota.hard_limit = 10
     quota.save()
     
 
@@ -223,7 +223,7 @@ def upgrade_cases():
                     'deleted': False,
                     'project_id': 'test1',
                     'resource': 'instances',
-                    'limit': 10
+                    'hard_limit': 10
                 },
                 {
                     'created_at': time1,
@@ -232,7 +232,7 @@ def upgrade_cases():
                     'deleted': False,
                     'project_id': 'test1',
                     'resource': 'cores',
-                    'limit': 40
+                    'hard_limit': 40
                 },
                 {
                     'created_at': time1,
@@ -241,7 +241,7 @@ def upgrade_cases():
                     'deleted': False,
                     'project_id': 'test1',
                     'resource': 'gigabytes',
-                    'limit': 20
+                    'hard_limit': 20
                 },
                 {
                     'created_at': time1,
@@ -250,7 +250,7 @@ def upgrade_cases():
                     'deleted': False,
                     'project_id': 'test1',
                     'resource': 'metadata_items',
-                    'limit': 5
+                    'hard_limit': 5
                 },
             ],
         },
@@ -273,7 +273,7 @@ def upgrade_cases():
                     'deleted_at': time3,
                     'deleted': True,
                     'resource': 'volumes',
-                    'limit': 10,
+                    'hard_limit': 10,
                 },
             ],
         },
@@ -291,19 +291,19 @@ def downgrade_cases():
                     'project_id': 'test_usual',
                     'created_at': time1,
                     'resource': 'instances',
-                    'limit': 10,
+                    'hard_limit': 10,
                 },
                 {
                     'project_id': 'test_usual',
                     'created_at': time2,
                     'resource': 'cores',
-                    'limit': 20,
+                    'hard_limit': 20,
                 },
                 {
                     'project_id': 'test_usual',
                     'created_at': None,
                     'resource': 'volumes',
-                    'limit': 10,
+                    'hard_limit': 10,
                 },
             ],
             'after': [
@@ -328,19 +328,19 @@ def downgrade_cases():
                     'project_id': 'test_update_time',
                     'updated_at': time1,
                     'resource': 'gigabytes',
-                    'limit': 50,
+                    'hard_limit': 50,
                 },
                 {
                     'project_id': 'test_update_time',
                     'updated_at': time2,
                     'resource': 'floating_ips',
-                    'limit': 10,
+                    'hard_limit': 10,
                 },
                 {
                     'project_id': 'test_update_time',
                     'updated_at': None,
                     'resource': 'metadata_items',
-                    'limit': 5,
+                    'hard_limit': 5,
                 },
             ],
             'after': [
@@ -361,12 +361,12 @@ def downgrade_cases():
                 {
                     'project_id': 'test_unrecognized_resources',
                     'resource': 'instances',
-                    'limit': 10,
+                    'hard_limit': 10,
                 },
                 {
                     'project_id': 'test_unrecognized_resources',
                     'resource': 'cloudflowers',
-                    'limit': 1,
+                    'hard_limit': 1,
                 },
             ],
             'after': [
@@ -383,7 +383,7 @@ def downgrade_cases():
                     'deleted': True,
                     'deleted_at': time2,
                     'resource': 'instances',
-                    'limit': 10,
+                    'hard_limit': 10,
                 },
             ],
             'after': [],
@@ -393,12 +393,12 @@ def downgrade_cases():
                 {
                     'project_id': 'test_unlimited_instances',
                     'resource': 'instances',
-                    'limit': None,
+                    'hard_limit': None,
                 },
                 {
                     'project_id': 'test_unlimited_instances',
                     'resource': 'cores',
-                    'limit': 10,
+                    'hard_limit': 10,
                 },
             ],
             'after': [
